@@ -1,7 +1,6 @@
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import WindowProperties
 from panda3d.core import CollisionTraverser, CollisionHandlerPusher
-from panda3d.core import LineSegs
 from direct.gui.DirectGui import *
 from panda3d.core import *
 from GameObject import *
