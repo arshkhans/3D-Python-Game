@@ -1,5 +1,5 @@
 # 3D-Python-Game
-3D-Game in Python using Pand3d framework.
+3D-Game in Python using Panda3d framework.
 
 ## Description
 
