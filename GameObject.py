@@ -3,6 +3,7 @@ from direct.actor.Actor import Actor
 from panda3d.core import CollisionNode, CollisionTube
 from panda3d.core import BitMask32
 from direct.interval.IntervalGlobal import *
+from direct.interval.LerpInterval import *
 
 FRICTION = 150.0
 
@@ -98,7 +99,7 @@ class Player(GameObject):
 
         self.actor.loop("stand")
         
-        self.sensitivityY = 2
+        self.sensitivityY = 1
         self.sensitivityX = 0.01
         
         self.dummyNode = render.attachNewNode("center")                       # type: ignore
@@ -133,16 +134,21 @@ class Player(GameObject):
             y=base.mouseWatcherNode.getMouseY()                               # type: ignore
             
             if x > 0:
-                self.actor.setH(self.actor.getH()-self.sensitivityY)
+                # self.actor.setH(self.actor.getH()-self.sensitivityY)
+                LerpHprInterval(self.actor, 0.0001, (self.actor.getHpr()-(self.sensitivityY,0,0))).start()
+
             if x < 0:
-                self.actor.setH(self.actor.getH()+self.sensitivityY)
+                # self.actor.setH(self.actor.getH()+self.sensitivityY)
+                LerpHprInterval(self.actor, 0.0001, (self.actor.getHpr()+(self.sensitivityY,0,0))).start()
             
             if y > 0.002 and self.dummyNode.getZ() < 2:
                 self.dummyNode.detachNode()
-                self.dummyNode.setZ(self.dummyNode.getZ() + self.sensitivityX)
+                # self.dummyNode.setZ(self.dummyNode.getZ() + self.sensitivityX)
+                LerpPosInterval(self.dummyNode, 0.0001, (self.dummyNode.getPos()+(0,0,self.sensitivityX))).start()
             if y < 0 and self.dummyNode.getZ() > 0.69:                        # nice!
                 self.dummyNode.detachNode()
-                self.dummyNode.setZ(self.dummyNode.getZ() - self.sensitivityX)
+                # self.dummyNode.setZ(self.dummyNode.getZ() - self.sensitivityX)
+                LerpPosInterval(self.dummyNode, 0.0001, (self.dummyNode.getPos()-(0,0,self.sensitivityX))).start()
             
             self.dummyNode.reparentTo(self.actor)
              
@@ -179,8 +185,8 @@ class Player(GameObject):
             if not standControl.isPlaying():
                 self.actor.stop("walk")
                 self.actor.loop("stand")
-        
-        camera.lookAt(self.dummyNode)                                     # type: ignore
+        if base.currentLevel.name != "Lv3" and base.currentLevel.name != "Lv4": # type: ignore
+            camera.lookAt(self.dummyNode)                                       # type: ignore
     
     def cleanup(self):
         GameObject.cleanup(self)

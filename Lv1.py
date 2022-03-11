@@ -4,9 +4,8 @@ from direct.gui.DirectGui import *
 from direct.gui.OnscreenImage import OnscreenImage
 from panda3d.core import TransparencyAttrib
 from direct.interval.LerpInterval import *
-from Lv2 import *
 
-loadPrcFileData("", "load-file-type p3assimp")                          # type: ignore
+loadPrcFileData("", "load-file-type p3assimp")                                # type: ignore
 
 doors = {
     "D1": {
@@ -61,17 +60,25 @@ doors = {
 
 class Lv1():
     def __init__(self):
-        self.environment = loader.loadModel("obj/lv1.obj")               # type: ignore     
-        self.environment.reparentTo(render)                               # type: ignore
+        base.player.actor.setPos(0,-3,0)                                      # type: ignore                                 
+
+        self.environment = loader.loadModel("obj/lv1.obj")                    # type: ignore
+        self.environment.reparentTo(render)                                   # type: ignore
         self.environment.setPos(0, 0, 0)
         self.environment.setHpr(0,90,0)
         
         self.environment.setScale(0.003, 0.002, 0.003)
+
+        self.name = "Lv1"
         
-        self.gg = None
         self.score = 0
-        self.lv2 = None
-        
+
+        self.gameOver = None
+        self.skipLevel = None
+        self.cleared = None
+
+        self.nextLevel = "Lv2"
+
         self.crossHair = OnscreenImage(image='pack.png', pos=(0, 0, 0),scale = 0.04)
         self.crossHair.setTransparency(TransparencyAttrib.MAlpha)
         
@@ -113,7 +120,7 @@ class Lv1():
                         parent = self.gameOverScreen,
                         scale = 0.1,
                         pos = (0, 0, 0),
-                        text_font = base.font,                     # type: ignore
+                        text_font = base.font,                                # type: ignore
                         relief = None,
                         text_fg = (1, 1, 1, 1))
         
@@ -136,7 +143,7 @@ class Lv1():
                            pos = (0, 0, -0.4),
                            parent = self.gameOverScreen,
                            scale = 0.07,
-                           text_font = base.font,                             # type: ignore                             # type: ignore
+                           text_font = base.font,                             # type: ignore
                            clickSound = loader.loadSfx("Sounds/UIClick.ogg"), # type: ignore
                            frameTexture = base.buttonImages,                  # type: ignore
                            frameSize = (-4, 4, -1, 1),
@@ -366,71 +373,71 @@ class Lv1():
         wall.setX(44.7)
         # wall.show()
     
-    def update(self,pX,pY):
-        if self.lv2 is None:
-            for door , cords in doors.items(): 
-                    if pX >= cords["x"][0] and pX <= cords["x"][1] and \
-                        pY >= cords["y"][0] and pY <= cords["y"][1]:
-                            doors[door]["status"] = "onDoor"
-                    self.updateDoor(door,pX,pY)
-            self.doorCheck()
-            self.gameCleared()
-            if ( (-7.5 < pX < -3) or (-4.5 < pY < 0) or (46 < pX < 49) or (31 < pY < 35) )and \
-                (doors["D1"]["status"] == doors["D3"]["status"] \
-                == doors["D16"]["status"] == doors["D15"]["status"] \
-                == doors["D13"]["status"] == doors["D12"]["status"] \
-                == doors["D10"]["status"] == doors["D9"]["status"] \
-                == doors["D5"]["status"] == "Closed"):
-                self.message["text"] = "Stuck Outside :<"
-                if self.gameCleared() is False:
-                    self.gameOver()
-            if ( (-2 < pX < 10) and (2 < pY < 13) ) and \
-                (doors["D1"]["status"] == doors["D2"]["status"] \
-                == doors["D3"]["status"] == doors["D4"]["status"] == "Closed"):
-                self.message["text"] = "Stuck in Room-1 :'("
-                if self.gameCleared() is False:
-                    self.gameOver()
-            if ( (13 < pX < 27) and (2 < pY < 13) ) and \
-                (doors["D4"]["status"] == doors["D5"]["status"] \
-                == doors["D6"]["status"] == doors["D7"]["status"] \
-                == doors["D8"]["status"] == "Closed"):
-                self.message["text"] = "Stuck in Room-2 :'<"
-                if self.gameCleared() is False:
-                    self.gameOver()
-            if ( (32 < pX < 42) and (2 < pY < 13) ) and \
-                (doors["D8"]["status"] == doors["D9"]["status"] \
-                == doors["D10"]["status"] == doors["D11"]["status"] == "Closed"):
-                self.message["text"] = "Stuck in Room-3 :("
-                if self.gameCleared() is False:
-                    self.gameOver()
-            if ( (-2 < pX < 19) and (16 < pY < 29 ) ) and \
-                (doors["D2"]["status"] == doors["D6"]["status"] \
-                == doors["D14"]["status"] == doors["D15"]["status"] \
-                == doors["D16"]["status"] == "Closed"):
-                self.message["text"] = "Stuck in Room-4 :'("
-                if self.gameCleared() is False:
-                    self.gameOver()
-            if ( (22 < pX < 43) and (16 < pY < 29 ) ) and \
-                (doors["D7"]["status"] == doors["D11"]["status"] \
-                == doors["D12"]["status"] == doors["D13"]["status"] \
-                == doors["D14"]["status"] == "Closed"):
-                self.message["text"] = "Stuck in Room-5 :("
-                if self.gameCleared() is False:
-                    self.gameOver()
-        else:
-            self.lv2.update()
+    def update(self):
+        pX = base.pX                                                          # type: ignore
+        pY = base.pY                                                          # type: ignore
+        for door , cords in doors.items(): 
+                if pX >= cords["x"][0] and pX <= cords["x"][1] and \
+                    pY >= cords["y"][0] and pY <= cords["y"][1]:
+                        doors[door]["status"] = "onDoor"
+                self.updateDoor(door,pX,pY)
+        self.doorCheck()
+        self.gameCleared()
+        if ( (-7.5 < pX < -3) or (-4.5 < pY < 0) or (46 < pX < 49) or (31 < pY < 35) )and \
+            (doors["D1"]["status"] == doors["D3"]["status"] \
+            == doors["D16"]["status"] == doors["D15"]["status"] \
+            == doors["D13"]["status"] == doors["D12"]["status"] \
+            == doors["D10"]["status"] == doors["D9"]["status"] \
+            == doors["D5"]["status"] == "Closed"):
+            self.message["text"] = "Stuck Outside :<"
+            if self.gameCleared() is False:
+                self.gameOverMethod()
+        if ( (-2 < pX < 10) and (2 < pY < 13) ) and \
+            (doors["D1"]["status"] == doors["D2"]["status"] \
+            == doors["D3"]["status"] == doors["D4"]["status"] == "Closed"):
+            self.message["text"] = "Stuck in Room-1 :'("
+            if self.gameCleared() is False:
+                self.gameOverMethod()
+        if ( (13 < pX < 27) and (2 < pY < 13) ) and \
+            (doors["D4"]["status"] == doors["D5"]["status"] \
+            == doors["D6"]["status"] == doors["D7"]["status"] \
+            == doors["D8"]["status"] == "Closed"):
+            self.message["text"] = "Stuck in Room-2 :'<"
+            if self.gameCleared() is False:
+                self.gameOverMethod()
+        if ( (32 < pX < 42) and (2 < pY < 13) ) and \
+            (doors["D8"]["status"] == doors["D9"]["status"] \
+            == doors["D10"]["status"] == doors["D11"]["status"] == "Closed"):
+            self.message["text"] = "Stuck in Room-3 :("
+            if self.gameCleared() is False:
+                self.gameOverMethod()
+        if ( (-2 < pX < 19) and (16 < pY < 29 ) ) and \
+            (doors["D2"]["status"] == doors["D6"]["status"] \
+            == doors["D14"]["status"] == doors["D15"]["status"] \
+            == doors["D16"]["status"] == "Closed"):
+            self.message["text"] = "Stuck in Room-4 :'("
+            if self.gameCleared() is False:
+                self.gameOverMethod()
+        if ( (22 < pX < 43) and (16 < pY < 29 ) ) and \
+            (doors["D7"]["status"] == doors["D11"]["status"] \
+            == doors["D12"]["status"] == doors["D13"]["status"] \
+            == doors["D14"]["status"] == "Closed"):
+            self.message["text"] = "Stuck in Room-5 :("
+            if self.gameCleared() is False:
+                self.gameOverMethod()
     
     def updateDoor(self,door,pX,pY):
         if doors[door]["status"] == "onDoor":
             if not (pX >= doors[door]["x"][0] and pX <= doors[door]["x"][1] and \
                 pY >= doors[door]["y"][0] and pY <= doors[door]["y"][1]):
-                    doors[door]["status"] = "Closed" 
-            if base.keyMap["down"] is True:                                 # type: ignore
+                    doors[door]["status"] = "Closed"
+
+            if base.keyMap["down"] is True:                                   # type: ignore
                 doors[door]["status"] = "Open"
     
     def doorCheck(self):
         for d,stat in doors.items():
-            temp = render.find("@@"+d)                                       # type: ignore
+            temp = render.find("@@"+d)                                        # type: ignore
             curD = self.environment.find("**/"+d)
             if stat["status"] == "Closed" and temp.isStashed():
                 self.doorSound.play()
@@ -438,33 +445,37 @@ class Lv1():
                 temp.unstash() 
                 self.score += 1
     
-    def gameOver(self):
+    def gameOverMethod(self):
         self.gameOverBackdrop.show()
         self.gameOverScreen.show()    
         self.finalScoreLabel["text"] = "Doors Closed:"+str(self.score)+"/16"
-        self.gg = "GameOver"
-        base.keyMap["pause"] = True                                         # type: ignore
+        self.gameOver = True
+
+        base.keyMap["pause"] = True                                           # type: ignore
     
     def gameCleared(self):
         clear = True
-        for c in doors.values():
-            if c["status"] == "Open":  
-                return False        
-        if clear == True:
+        if self.skipLevel is None:
+            for c in doors.values():
+                if c["status"] == "Open":  
+                    return False
+        if clear is True or self.skipLevel is True:
             for d,v in doors.items():
                 if v["status"] == "Closed":
                     temp = render.find(d)                                        # type: ignore
                     temp.stash()
-            curD = self.environment.find("**/"+d)
-            curD.setPos(0,0,0)
-            v["status"] = "Open"
-            print("Level1 Cleared")
-            self.environment.removeNode()
-            temp = render.findAllMatches("wall")                               # type: ignore
-            temp.detach()
-            temp = render.findAllMatches("@@*")                               # type: ignore
-            temp.detach()
-            self.lv2 = Lv2()
+                try:
+                    curD = self.environment.find("**/"+d)
+                    curD.setPos(0,0,0)
+                except Exception as e:
+                    print(e)
+                v["status"] = "Open"
+                self.environment.removeNode()
+                temp = render.findAllMatches("wall")                             # type: ignore
+                temp.detach()
+                temp = render.findAllMatches("@@*")                              # type: ignore
+                temp.detach()
+            self.cleared = True
             return True
     
     def cleanup(self):
