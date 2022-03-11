@@ -134,21 +134,21 @@ class Player(GameObject):
             y=base.mouseWatcherNode.getMouseY()                               # type: ignore
             
             if x > 0:
-                # self.actor.setH(self.actor.getH()-self.sensitivityY)
-                LerpHprInterval(self.actor, 0.0001, (self.actor.getHpr()-(self.sensitivityY,0,0))).start()
+                self.actor.setH(self.actor.getH()-self.sensitivityY)
+                # LerpHprInterval(self.actor, 0.0001, (self.actor.getHpr()-(self.sensitivityY,0,0))).start()
 
             if x < 0:
-                # self.actor.setH(self.actor.getH()+self.sensitivityY)
-                LerpHprInterval(self.actor, 0.0001, (self.actor.getHpr()+(self.sensitivityY,0,0))).start()
+                self.actor.setH(self.actor.getH()+self.sensitivityY)
+                # LerpHprInterval(self.actor, 0.0001, (self.actor.getHpr()+(self.sensitivityY,0,0))).start()
             
             if y > 0.002 and self.dummyNode.getZ() < 2:
                 self.dummyNode.detachNode()
-                # self.dummyNode.setZ(self.dummyNode.getZ() + self.sensitivityX)
-                LerpPosInterval(self.dummyNode, 0.0001, (self.dummyNode.getPos()+(0,0,self.sensitivityX))).start()
+                self.dummyNode.setZ(self.dummyNode.getZ() + self.sensitivityX)
+                # LerpPosInterval(self.dummyNode, 0.0001, (self.dummyNode.getPos()+(0,0,self.sensitivityX))).start()
             if y < 0 and self.dummyNode.getZ() > 0.69:                        # nice!
                 self.dummyNode.detachNode()
-                # self.dummyNode.setZ(self.dummyNode.getZ() - self.sensitivityX)
-                LerpPosInterval(self.dummyNode, 0.0001, (self.dummyNode.getPos()-(0,0,self.sensitivityX))).start()
+                self.dummyNode.setZ(self.dummyNode.getZ() - self.sensitivityX)
+                # LerpPosInterval(self.dummyNode, 0.0001, (self.dummyNode.getPos()-(0,0,self.sensitivityX))).start()
             
             self.dummyNode.reparentTo(self.actor)
              
