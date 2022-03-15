@@ -49,10 +49,10 @@ testing = [
 class Lv2(ShowBase):
     def __init__(self):
         
-        self.myTexture = loader.loadTexture("obj/KeyMap/Hover.jpg")           # type: ignore
+        self.myTexture = loader.loadTexture("env/lv2/KeyMap/Hover.jpg")           # type: ignore
         
-        self.environment = loader.loadModel("obj/lv2.obj")                    # type: ignore
-        self.environment.reparentTo(render)                                   # type: ignore
+        self.environment = loader.loadModel("env/lv2/lv2.obj")                    # type: ignore
+        self.environment.reparentTo(render)                                       # type: ignore
         
         self.environment.setPos(0, 0, 0)
         self.environment.setHpr(0,90,0)
@@ -61,16 +61,21 @@ class Lv2(ShowBase):
         render.setShaderAuto()                                               # type: ignore
         
         self.name = "Lv2"
+        self.lv = 2
 
         self.gameOver = None
         self.skipLevel = None
         self.cleared = None
-        self.nextLevel = "Lv3"
+        self.wait = None
+
+        self.nextLevel = "Lv4"
+
         self.accept("mouse1", self.click)
 
         self.queue = CollisionHandlerQueue()
         
-        self.solve = copy.deepcopy(unSolvable[0])
+        # self.solve = copy.deepcopy(unSolvable[0])
+        self.solve = copy.deepcopy(solvable)
         self.solveCord = {}
 
         for Drow in defaultMatrix:
@@ -181,9 +186,11 @@ class Lv2(ShowBase):
         
         if self.solve == defaultMatrix or self.skipLevel == True:
             self.cleared = True
+            self.cleanup()
         self.ray.reparentTo(base.camera)                                    # type: ignore
 
     def cleanup(self):
+        print("cleanupp")
         self.environment.removeNode()
         for i in render.getChildren():                                       # type: ignore
             i.removeNode()

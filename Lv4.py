@@ -28,10 +28,12 @@ class Lv4(ShowBase):
         self.queen = 8
         self.clicks = 0
         self.name = "Lv4"
+        self.lv = 4
 
         self.gameOver = None
         self.skipLevel = None
         self.cleared = None
+        self.wait = None
 
         self.nextLevel = "None"
 
@@ -44,7 +46,7 @@ class Lv4(ShowBase):
         self.environment = loader.loadModel("env/lv4/env.obj")                         # type: ignore
         self.environment.reparentTo(render)                                            # type: ignore
 
-        base.disableMouse()                                                            # type: ignore
+        # base.disableMouse()                                                            # type: ignore
 
         base.camera.reparentTo(render)                                                 # type: ignore
         base.camera.lookAt(render)                                                     # type: ignore
@@ -70,7 +72,6 @@ class Lv4(ShowBase):
         render.setShaderAuto()                                                         # type: ignore
         
         self.queue = CollisionHandlerQueue()
-
 
         base.accept("mouse1", self.click)                                              # type: ignore
 
@@ -107,6 +108,7 @@ class Lv4(ShowBase):
                             font = self.font,
                             scale = 0.11)
 
+        print(render.ls())# type: ignore
         base.hint["text"] = 'Hint: Place eight queens on the chessboard\nsuch that none of them attack one another.' # type: ignore
     
     def click(self):

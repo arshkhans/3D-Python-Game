@@ -79,10 +79,10 @@ class Player(GameObject):
     def __init__(self):
         GameObject.__init__(self,
                             Vec3(0, 0, 0),
-                            "Models/PandaChan/act_p3d_chan",
+                            "env/char/PandaChan/act_p3d_chan",
                               {
-                                  "stand" : "Models/PandaChan/a_p3d_chan_idle",
-                                  "walk" : "Models/PandaChan/a_p3d_chan_run"
+                                  "stand" : "env/char/PandaChan/a_p3d_chan_idle",
+                                  "walk" : "env/char/PandaChan/a_p3d_chan_run"
                               },
                             5,
                             10,

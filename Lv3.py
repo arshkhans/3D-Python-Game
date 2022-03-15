@@ -16,7 +16,7 @@ mp_hands = mp.solutions.hands
 class Lv3():
     def __init__(self):
         self.cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-        self.environment = loader.loadModel("obj/lv3.obj")                                 # type: ignore
+        self.environment = loader.loadModel("env/lv3/lv3.obj")                                 # type: ignore
         self.environment.reparentTo(render)                                                # type: ignore
         self.environment.setPos(0, 0, 0)
         self.environment.setHpr(0,90,0)
@@ -32,10 +32,12 @@ class Lv3():
         base.disableMouse()                                                                # type: ignore
 
         self.name = "Lv3"
+        self.lv = 3
 
         self.gameOver = None
         self.skipLevel = None
         self.cleared = None
+        self.wait = None
         self.nextLevel = "Lv4"
 
         render.setShaderAuto()                                                             # type: ignore

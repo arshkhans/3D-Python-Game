@@ -1,11 +1,14 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 tests.py
-testLv4.py
+modelTest.py
 setup.py
 requirements.txt
 Fonts
 audios
+data
+modelFirstperson.py
+playerObject.py
 *.py[cod]
 *$py.class
 
