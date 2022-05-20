@@ -45,7 +45,7 @@ class Lv3():
         self.nextLevel = "Lv4"
 
         self.score = 0
-        self.maxScore = 3
+        self.maxScore = 5
 
         self.gameStaus = None
 
@@ -57,7 +57,7 @@ class Lv3():
         render.setShaderAuto()                                                         # type: ignore
 
         # Hint 
-        base.hint["text"] = "Hint: Win three rounds to clear"                          # type: ignore
+        base.hint["text"] = "Hint: Win Five rounds to clear"                          # type: ignore
 
         self.startBtn = DirectButton(text = "",
                     command = self.start,
