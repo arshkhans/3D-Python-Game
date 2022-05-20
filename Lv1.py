@@ -91,12 +91,12 @@ class Lv1():
         # Sound
         self.playingSound = base.loader.loadSfx("audios/playing.ogg")         # type: ignore
         self.playingSound.setLoop(True)
-        self.playingSound.setVolume(1) # 0.1 (0-1)
-        # self.playingSound.play()
+        self.playingSound.setVolume(0.06) # 0.06 (0-1)
+        self.playingSound.play()
         
         self.doorSound = base.loader.loadSfx("audios/doorClosing.ogg")        # type: ignore
         self.doorSound.setLoop(False)
-        self.doorSound.setVolume(0.5) # 0.04 (0-1)
+        self.doorSound.setVolume(0.04) # 0.04 (0-1)
         
         # Game-Over Screen
         self.gameOverBackdrop = DirectFrame(frameColor = (0, 0, 0, 1),
@@ -480,6 +480,7 @@ class Lv1():
 
         if self.skipLevel is True or self.cleared is True:
             base.keyMap["pause"] = False                                          # type: ignore
+            self.playingSound.stop()
             self.message.hide()
             self.scoreShow.hide()
             base.gameBackdrop.hide()                                              # type: ignore

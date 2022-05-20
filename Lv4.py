@@ -105,13 +105,16 @@ class Lv4(ShowBase):
         self.clickInfo = OnscreenText(text="",
                             pos=(0.95, 0.9, 0),
                             font = self.font,
-                            # scale = 0.1,
+                            scale = 0.1,
                             parent = render2d) # type: ignore
 
         self.queenCount = OnscreenText(text="",
-                            pos=(1.85, -0.95),
+                            pos=(0.95, -0.95, 0),
                             font = self.font,
-                            scale = 0.11)
+                            parent = render2d,   # type: ignore
+                            scale = 0.05
+                            )
+                            
         base.hint["text"] = 'Hint: Place eight queens on the chessboard\nsuch that none of them attack one another.' # type: ignore
     
     def click(self):

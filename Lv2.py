@@ -86,9 +86,9 @@ class Lv2(ShowBase):
         # Hint
         base.hint["text"] = "Arraange the numbers in Ascending order."    # type: ignore
         
-        # self.solve = copy.deepcopy(unSolvable[0])
+        self.solve = copy.deepcopy(unSolvable[0])
         # self.solve = copy.deepcopy(solvable)
-        self.solve = copy.deepcopy(testing)
+        # self.solve = copy.deepcopy(testing)
         self.solveCord = {}
 
         for Drow in defaultMatrix:

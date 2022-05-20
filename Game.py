@@ -11,7 +11,7 @@ from Lv4 import *
 import os
 from cryptography.fernet import Fernet
 
-loadPrcFileData("", "load-file-type p3assimp")                              # type: ignore
+# loadPrcFileData("", "load-file-type p3assimp")                              # type: ignore
 # w, h = 1366, 768
 # loadPrcFileData('', 'win-size %i %i' % (w, h))                              # type: ignore
 # loadPrcFileData("", "fullscreen true")                                      # type: ignore
@@ -88,7 +88,7 @@ class Game(ShowBase):
         self.pX = None
         self.pY = None
         
-        self.disableAllAudio()                                                # type: ignore
+        # self.disableAllAudio()                                                # type: ignore
         
         self.keyMap = {
             "up" : False,
@@ -120,7 +120,7 @@ class Game(ShowBase):
         
         self.loadingSound = loader.loadSfx("audios/loading.ogg")         # type: ignore
         self.loadingSound.setLoop(True)
-        self.loadingSound.setVolume(1) # 0.05 (0-1)
+        self.loadingSound.setVolume(0.05) # 0.05 (0-1)
         self.loadingSound.play()
 
         # Font
