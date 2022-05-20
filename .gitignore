@@ -9,6 +9,10 @@ audios
 data
 modelFirstperson.py
 playerObject.py
+level3test.py
+level4test.py
+.vscode
+some
 *.py[cod]
 *$py.class
 

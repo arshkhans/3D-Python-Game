@@ -60,12 +60,17 @@ class Lv1():
     def __init__(self):
         base.player.actor.setPos(0,-3,0)                                      # type: ignore                                 
 
-        self.environment = loader.loadModel("env/lv1/env.obj")                # type: ignore
+        self.environment = loader.loadModel("env/lv1/lv1.obj")                # type: ignore
         self.environment.reparentTo(render)                                   # type: ignore
         self.environment.setPos(0, 0, 0)
         self.environment.setHpr(0,90,0)
-        
-        self.environment.setScale(0.01, 0.01, 0.01)
+
+        self.environment.setScale(0.003, 0.002, 0.003)
+
+        r = self.environment.find("**/roof")
+        r.removeNode()
+        r = self.environment.find("**/slab")
+        r.removeNode()
 
         self.name = "Lv1"
         
@@ -80,15 +85,18 @@ class Lv1():
         self.nextLevel = "Lv2"
 
         base.crossHair.show()                                                 # type: ignore
+
+        base.hint["text"] = "Hint: Close all the doors to clear the Level"                  # type: ignore
         
         # Sound
         self.playingSound = base.loader.loadSfx("audios/playing.ogg")         # type: ignore
         self.playingSound.setLoop(True)
-        self.playingSound.setVolume(0.1) # 0.1
+        self.playingSound.setVolume(1) # 0.1 (0-1)
+        # self.playingSound.play()
         
         self.doorSound = base.loader.loadSfx("audios/doorClosing.ogg")        # type: ignore
         self.doorSound.setLoop(False)
-        self.doorSound.setVolume(0.04) # 0.04
+        self.doorSound.setVolume(0.5) # 0.04 (0-1)
         
         # Game-Over Screen
         self.gameOverBackdrop = DirectFrame(frameColor = (0, 0, 0, 1),
@@ -116,7 +124,7 @@ class Lv1():
                                    text_fg = (1, 1, 1, 1))
         
         self.message = DirectLabel(text = "",
-                        parent = self.gameOverScreen,
+                        parent = render2d,                                    # type: ignore
                         scale = 0.1,
                         pos = (0, 0, 0),
                         text_font = base.font,                                # type: ignore
@@ -150,229 +158,234 @@ class Lv1():
                            relief = DGG.FLAT,
                            text_pos = (0, -0.2))
         btn.setTransparency(True)
-        
+
+        # Top Score
+        self.scoreShow = OnscreenText(text="Score",
+                            pos=(0, 0.92),
+                            scale = 0.06,
+                            parent = render2d) # type: ignore
+        self.scoreShow.show()
+
         # Outer Walls
-        wallSolid = CollisionTube(-18.0, 0, 0, 36, 0, 0, 0.2)
+        wallSolid = CollisionTube(-9.0, 0, 0, 50.3, 0, 0, 0.2)
         wallNode = CollisionNode("wall")
         wallNode.addSolid(wallSolid)
         wall = render.attachNewNode(wallNode)                                 # type: ignore
-        wall.setY(-17)
-        wall.show()
-
-        wallSolid = CollisionTube(-18.0, 0, 0, 36, 0, 0, 0.2)
+        wall.setY(-5.9)
+        # wall.show()
+        wallSolid = CollisionTube(-9.0, 0, 0, 50.3, 0, 0, 0.2)
         wallNode = CollisionNode("wall")
         wallNode.addSolid(wallSolid)
         wall = render.attachNewNode(wallNode)                                 # type: ignore
-        wall.setY(22)
-        wall.show()
-
-        wallSolid = CollisionTube(0, -17, 0, 0, 22, 0, 0.2)
+        wall.setY(37.2)
+        # wall.show()
+        wallSolid = CollisionTube(0, -5.9, 0, 0, 37.2, 0, 0.2)
         wallNode = CollisionNode("wall")
         wallNode.addSolid(wallSolid)
         wall = render.attachNewNode(wallNode)                                 # type: ignore
-        wall.setX(-18.0)
-        wall.show()
-
-        wallSolid = CollisionTube(0, -17, 0, 0, 22, 0, 0.2)
+        wall.setX(-9.0)
+        # wall.show()
+        wallSolid = CollisionTube(0, -5.9, 0, 0, 37.2, 0, 0.2)
         wallNode = CollisionNode("wall")
         wallNode.addSolid(wallSolid)
         wall = render.attachNewNode(wallNode)                                 # type: ignore
-        wall.setX(36)
-        wall.show()
+        wall.setX(50.3)
+        # wall.show()
         
-        # Doors 1 - 5 - 6
+        # Doors 1 - 5 - 9
         wallGap = CollisionNode("D1")
-        wallGap.addSolid(CollisionTube(-6.5, 0, 0, -4.5, 0, 0, 0.2))
+        wallGap.addSolid(CollisionTube(2.9, 0, 0, 5.1, 0, 0, 0.2))
         door = render.attachNewNode(wallGap)                                  # type: ignore
-        door.setY(-10.5)
+        door.setY(-0.1)
+        door.stash()
+        door.show()
+        
+        wallGap = CollisionNode("D5")
+        wallGap.addSolid(CollisionTube(19.5, 0, 0, 21.7, 0, 0, 0.2))
+        door = render.attachNewNode(wallGap)                                  # type: ignore
+        door.setY(-0.1)
         door.stash()
         # door.show()
         
-        wallGap = CollisionNode("D5")
-        wallGap.addSolid(CollisionTube(8, 0, 0, 10, 0, 0, 0.2))
+        wallGap = CollisionNode("D9")
+        wallGap.addSolid(CollisionTube(36.2, 0, 0, 38.4, 0, 0, 0.2))
         door = render.attachNewNode(wallGap)                                  # type: ignore
-        door.setY(-10.5)
+        door.setY(-0.1)
+        door.stash()
+        # door.show()
+        
+        # Wall
+        wallNode = CollisionNode("wall")
+        wallNode.addSolid(CollisionTube(-3.1, 0, 0, 2.9, 0, 0, 0.2))
+        wallNode.addSolid(CollisionTube(5.1, 0, 0, 19.5, 0, 0, 0.2))
+        wallNode.addSolid(CollisionTube(21.7, 0, 0, 36.2, 0, 0, 0.2))
+        wallNode.addSolid(CollisionTube(38.4, 0, 0, 44.4, 0, 0, 0.2))
+        wall = render.attachNewNode(wallNode)                                 # type: ignore
+        wall.setY(-0.05)
+        # wall.show()
+        
+        # Doors 2 - 6 - 7 - 11
+        wallGap = CollisionNode("D2")
+        wallGap.addSolid(CollisionTube(2.9, 0, 0, 5.1, 0, 0, 0.2))
+        door = render.attachNewNode(wallGap)                                  # type: ignore
+        door.setY(14.75)
         door.stash()
         # door.show()
         
         wallGap = CollisionNode("D6")
-        wallGap.addSolid(CollisionTube(23, 0, 0, 25, 0, 0, 0.2))
+        wallGap.addSolid(CollisionTube(15.1, 0, 0, 17.3, 0, 0, 0.2))
         door = render.attachNewNode(wallGap)                                  # type: ignore
-        door.setY(-10.5)
+        door.setY(14.75)
         door.stash()
         # door.show()
         
-        # # Wall
-        wallNode = CollisionNode("wall")
-        wallNode.addSolid(CollisionTube(-10, 0, 0, -6.5, 0, 0, 0.2))
-        wallNode.addSolid(CollisionTube(-4.5, 0, 0, 8, 0, 0, 0.2))
-        wallNode.addSolid(CollisionTube(10, 0, 0, 23, 0, 0, 0.2))
-        wallNode.addSolid(CollisionTube(25, 0, 0, 29, 0, 0, 0.2))
-        wall = render.attachNewNode(wallNode)                                 # type: ignore
-        wall.setY(-10.5)
-        # wall.show()
-        
-        # Doors 2 - 11 - 10 - 8
-        wallGap = CollisionNode("D2")
-        wallGap.addSolid(CollisionTube(-6.5, 0, 0, -4.5, 0, 0, 0.2))
+        wallGap = CollisionNode("D7")
+        wallGap.addSolid(CollisionTube(24.1, 0, 0, 26.2, 0, 0, 0.2))
         door = render.attachNewNode(wallGap)                                  # type: ignore
-        door.setY(0.8)
+        door.setY(14.75)
         door.stash()
         # door.show()
         
         wallGap = CollisionNode("D11")
-        wallGap.addSolid(CollisionTube(3.5, 0, 0, 5.5, 0, 0, 0.2))
+        wallGap.addSolid(CollisionTube(36.2, 0, 0, 38.4, 0, 0, 0.2))
         door = render.attachNewNode(wallGap)                                  # type: ignore
-        door.setY(0.8)
-        door.stash()
-        # door.show()
-        
-        wallGap = CollisionNode("D10")
-        wallGap.addSolid(CollisionTube(13.5, 0, 0, 15.5, 0, 0, 0.2))
-        door = render.attachNewNode(wallGap)                                  # type: ignore
-        door.setY(0.8)
-        door.stash()
-        # door.show()
-        
-        wallGap = CollisionNode("D8")
-        wallGap.addSolid(CollisionTube(23, 0, 0, 25, 0, 0, 0.2))
-        door = render.attachNewNode(wallGap)                                  # type: ignore
-        door.setY(0.8)
+        door.setY(14.75)
         door.stash()
         # door.show()
         
         # Wall
         wallNode = CollisionNode("wall")
-        wallNode.addSolid(CollisionTube(-10, 0, 0, -6.5, 0, 0, 0.2))
-        wallNode.addSolid(CollisionTube(-4.5, 0, 0, 3.5, 0, 0, 0.2))
-        wallNode.addSolid(CollisionTube(5.5, 0, 0, 13.5, 0, 0, 0.2))
-        wallNode.addSolid(CollisionTube(15.5, 0, 0, 23, 0, 0, 0.2))
-        wallNode.addSolid(CollisionTube(25, 0, 0, 29, 0, 0, 0.2))
+        wallNode.addSolid(CollisionTube(-3.1, 0, 0, 2.9, 0, 0, 0.2))
+        wallNode.addSolid(CollisionTube(5.1, 0, 0, 15.1, 0, 0, 0.2))
+        wallNode.addSolid(CollisionTube(17.3, 0, 0, 24.1, 0, 0, 0.2))
+        wallNode.addSolid(CollisionTube(26.2, 0, 0, 36.2, 0, 0, 0.2))
+        wallNode.addSolid(CollisionTube(38.4, 0, 0, 44.4, 0, 0, 0.2))
         wall = render.attachNewNode(wallNode)                                 # type: ignore
-        wall.setY(0.8)
+        wall.setY(14.8)
         # wall.show()
         
-        # Doors 16 - 15
-        wallGap = CollisionNode("D16")
-        wallGap.addSolid(CollisionTube(-1.5, 0, 0, 0.5, 0, 0, 0.2))
-        door = render.attachNewNode(wallGap)                                  # type: ignore
-        door.setY(14)
-        door.stash()
-        # door.show()
-        
+        # Doors 15 - 13
         wallGap = CollisionNode("D15")
-        wallGap.addSolid(CollisionTube(18.2, 0, 0, 20.2, 0, 0, 0.2))
+        wallGap.addSolid(CollisionTube(7.5, 0, 0, 9.7, 0, 0, 0.2))
         door = render.attachNewNode(wallGap)                                  # type: ignore
-        door.setY(14)
+        door.setY(31.4)
+        door.stash()
+        # door.show()
+        
+        wallGap = CollisionNode("D13")
+        wallGap.addSolid(CollisionTube(31.6, 0, 0, 33.8, 0, 0, 0.2))
+        door = render.attachNewNode(wallGap)                                  # type: ignore
+        door.setY(31.4)
         door.stash()
         # door.show()
         
         # Wall
         wallNode = CollisionNode("wall")
-        wallNode.addSolid(CollisionTube(-10, 0, 0, -1.5, 0, 0, 0.2))
-        wallNode.addSolid(CollisionTube(0.5, 0, 0, 18.2, 0, 0, 0.2))
-        wallNode.addSolid(CollisionTube(20.2, 0, 0, 29, 0, 0, 0.2))
+        wallNode.addSolid(CollisionTube(-3.1, 0, 0, 7.5, 0, 0, 0.2))
+        wallNode.addSolid(CollisionTube(9.7, 0, 0, 31.6, 0, 0, 0.2))
+        wallNode.addSolid(CollisionTube(33.8, 0, 0, 44.4, 0, 0, 0.2))
         wall = render.attachNewNode(wallNode)                                 # type: ignore
-        wall.setY(14)
+        wall.setY(31.4)
         # wall.show()
         
-        # Doors 3 - 14
+        # Doors 3 - 16
         wallGap = CollisionNode("D3")
-        wallGap.addSolid(CollisionTube(0, -6, 0, 0, -4, 0, 0.2))
+        wallGap.addSolid(CollisionTube(0, 6.3, 0, 0, 8.5, 0, 0.2))
         door = render.attachNewNode(wallGap)                                  # type: ignore
-        door.setX(-10)
+        door.setX(-3.4)
         door.stash()
         # door.show()
         
-        wallGap = CollisionNode("D14")
-        wallGap.addSolid(CollisionTube(0, 6.5, 0, 0, 8.5, 0, 0.2))
+        wallGap = CollisionNode("D16")
+        wallGap.addSolid(CollisionTube(0, 22, 0, 0, 24.2, 0, 0.2))
         door = render.attachNewNode(wallGap)                                  # type: ignore
-        door.setX(-10)
+        door.setX(-3.4)
         door.stash()
         # door.show()
         
         # Wall
         wallNode = CollisionNode("wall")
-        wallNode.addSolid(CollisionTube(0, -10.5, 0, 0, -6, 0, 0.2))
-        wallNode.addSolid(CollisionTube(0, -4, 0, 0, 6.5, 0, 0.2))
-        wallNode.addSolid(CollisionTube(0, 8.5, 0, 0, 14, 0, 0.2))
+        wallNode.addSolid(CollisionTube(0, -0.1, 0, 0, 6.3, 0, 0.2))
+        wallNode.addSolid(CollisionTube(0, 8.5, 0, 0, 22, 0, 0.2))
+        wallNode.addSolid(CollisionTube(0, 24.2, 0, 0, 31.4, 0, 0.2))
         wall = render.attachNewNode(wallNode)                                 # type: ignore
-        wall.setX(-10)
+        wall.setX(-3.4)
         # wall.show()
         
         # Doors 4
         wallGap = CollisionNode("D4")
-        wallGap.addSolid(CollisionTube(0, -6, 0, 0, -4, 0, 0.2))
+        wallGap.addSolid(CollisionTube(0, 6.3, 0, 0, 8.5, 0, 0.2))
         door = render.attachNewNode(wallGap)                                  # type: ignore
-        door.setX(0.5)
+        door.setX(11.4)
         door.stash()
         # door.show()
         
         # Wall
         wallNode = CollisionNode("wall")
-        wallNode.addSolid(CollisionTube(0, -10.5, 0, 0, -6, 0, 0.2))
-        wallNode.addSolid(CollisionTube(0, -4, 0, 0, 0.7, 0, 0.2))
+        wallNode.addSolid(CollisionTube(0, -0.1, 0, 0, 6.3, 0, 0.2))
+        wallNode.addSolid(CollisionTube(0, 8.5, 0, 0, 14.8, 0, 0.2))
         wall = render.attachNewNode(wallNode)                                 # type: ignore
-        wall.setX(0.5)
+        wall.setX(11.4)
         # wall.show()
         
-        # Doors 9
-        wallGap = CollisionNode("D9")
-        wallGap.addSolid(CollisionTube(0, -6, 0, 0, -4, 0, 0.2))
+        # Doors 8
+        wallGap = CollisionNode("D8")
+        wallGap.addSolid(CollisionTube(0, 6.3, 0, 0, 8.5, 0, 0.2))
         door = render.attachNewNode(wallGap)                                  # type: ignore
-        door.setX(18)
+        door.setX(29.85)
         door.stash()
         # door.show()
         
         # Wall
         wallNode = CollisionNode("wall")
-        wallNode.addSolid(CollisionTube(0, -10.5, 0, 0, -6, 0, 0.2))
-        wallNode.addSolid(CollisionTube(0, -4, 0, 0, 0.7, 0, 0.2))
+        wallNode.addSolid(CollisionTube(0, -0.1, 0, 0, 6.3, 0, 0.2))
+        wallNode.addSolid(CollisionTube(0, 8.5, 0, 0, 14.8, 0, 0.2))
         wall = render.attachNewNode(wallNode)                                 # type: ignore
-        wall.setX(18)
+        wall.setX(29.85)
         # wall.show()
         
-        # Doors 13
-        wallGap = CollisionNode("D13")
-        wallGap.addSolid(CollisionTube(0, 6.5, 0, 0, 8.5, 0, 0.2))
+        # Doors 14
+        wallGap = CollisionNode("D14")
+        wallGap.addSolid(CollisionTube(0, 22, 0, 0, 24.2, 0, 0.2))
         door = render.attachNewNode(wallGap)                                  # type: ignore
-        door.setX(9.2)
+        door.setX(20.6)
         door.stash()
         # door.show()
         
         # Wall
         wallNode = CollisionNode("wall")
-        wallNode.addSolid(CollisionTube(0, 1, 0, 0, 6.5, 0, 0.2))
-        wallNode.addSolid(CollisionTube(0, 8.5, 0, 0, 14, 0, 0.2))
+        wallNode.addSolid(CollisionTube(0, 14.8, 0, 0, 22, 0, 0.2))
+        wallNode.addSolid(CollisionTube(0, 24.2, 0, 0, 31.3, 0, 0.2))
         wall = render.attachNewNode(wallNode)                                 # type: ignore
-        wall.setX(9.2)
+        wall.setX(20.6)
         # wall.show()
         
-        # Doors 7 - 12
-        wallGap = CollisionNode("D7")
-        wallGap.addSolid(CollisionTube(0, -6, 0, 0, -4, 0, 0.2))
+        # Doors 10 - 12
+        wallGap = CollisionNode("D10")
+        wallGap.addSolid(CollisionTube(0, 6.3, 0, 0, 8.5, 0, 0.2))
         door = render.attachNewNode(wallGap)                                  # type: ignore
-        door.setX(29)
+        door.setX(44.7)
         door.stash()
         # door.show()
         
         wallGap = CollisionNode("D12")
-        wallGap.addSolid(CollisionTube(0, 6.5, 0, 0, 8.5, 0, 0.2))
+        wallGap.addSolid(CollisionTube(0, 22, 0, 0, 24.2, 0, 0.2))
         door = render.attachNewNode(wallGap)                                  # type: ignore
-        door.setX(29)
+        door.setX(44.7)
         door.stash()
         # door.show()
         
         # Wall
         wallNode = CollisionNode("wall")
-        wallNode.addSolid(CollisionTube(0, -10.5, 0, 0, -6, 0, 0.2))
-        wallNode.addSolid(CollisionTube(0, -4, 0, 0, 6.5, 0, 0.2))
-        wallNode.addSolid(CollisionTube(0, 8.5, 0, 0, 14, 0, 0.2))
+        wallNode.addSolid(CollisionTube(0, -0.1, 0, 0, 6.3, 0, 0.2))
+        wallNode.addSolid(CollisionTube(0, 8.5, 0, 0, 22, 0, 0.2))
+        wallNode.addSolid(CollisionTube(0, 24.2, 0, 0, 31.4, 0, 0.2))
         wall = render.attachNewNode(wallNode)                                 # type: ignore
-        wall.setX(29)
+        wall.setX(44.7)
         # wall.show()
     
     def update(self):
+        self.scoreShow["text"] = str(self.score)+"/16"
         pX = base.pX                                                          # type: ignore
         pY = base.pY                                                          # type: ignore
         for door , cords in doors.items(): 
@@ -445,11 +458,13 @@ class Lv1():
                 self.score += 1
     
     def gameOverMethod(self):
-        self.gameOverBackdrop.show()
-        self.gameOverScreen.show()
-        self.finalScoreLabel["text"] = "Doors Closed:"+str(self.score)+"/16"
-        self.gameOver = True
-        base.keyMap["pause"] = True                                           # type: ignore
+        self.message.show()
+        # self.scoreShow["text"] = self.message["text"] + str(self.score)+"/16"
+        # self.gameOverBackdrop.show()
+        # self.gameOverScreen.show()
+        # self.finalScoreLabel["text"] = "Doors Closed:"+str(self.score)+"/16"
+        # self.gameOver = True
+        # base.keyMap["pause"] = True                                           # type: ignore
     
     def gameCleared(self):
         clear = True
@@ -458,13 +473,15 @@ class Lv1():
                 if c["status"] == "Open":
                     return False
         if clear is True:
-            self.wait = True
-            base.keyMap["pause"] = True                                           # type: ignore
-            base.gameBackdrop.show()                                              # type: ignore
-            base.gameClearedScreen.show()                                         # type: ignore
+            self.message["text"] = "Game Cleared"
+            # base.keyMap["pause"] = True                                           # type: ignore
+            # base.gameBackdrop.show()                                              # type: ignore
+            # base.gameClearedScreen.show()                                         # type: ignore
 
         if self.skipLevel is True or self.cleared is True:
             base.keyMap["pause"] = False                                          # type: ignore
+            self.message.hide()
+            self.scoreShow.hide()
             base.gameBackdrop.hide()                                              # type: ignore
             base.gameClearedScreen.hide()                                         # type: ignore
             for d,v in doors.items():
@@ -485,6 +502,8 @@ class Lv1():
             return True
     
     def cleanup(self):
+        self.message.hide()
+        self.scoreShow.hide()
         self.gameOverBackdrop.hide()
         self.gameOverScreen.hide()
         base.gameBackdrop.hide()                                              # type: ignore

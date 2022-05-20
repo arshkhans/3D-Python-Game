@@ -4,7 +4,9 @@ from panda3d.core import BitMask32
 from panda3d.core import *
 from panda3d.core import CollisionHandlerQueue
 from direct.interval.LerpInterval import *
+from direct.gui.DirectGui import *
 import copy
+from panda3d.core import TransparencyAttrib
 
 loadPrcFileData("", "load-file-type p3assimp")                                 # type: ignore
 
@@ -53,13 +55,16 @@ class Lv2(ShowBase):
         
         self.environment = loader.loadModel("env/lv2/lv2.obj")                    # type: ignore
         self.environment.reparentTo(render)                                       # type: ignore
+
+        self.environment.setTransparency(TransparencyAttrib.MAlpha)
         
         self.environment.setPos(0, 0, 0)
         self.environment.setHpr(0,90,0)
         self.environment.setScale(0.04, 0.04, 0.04)
         
         render.setShaderAuto()                                               # type: ignore
-        
+        base.crossHair.show()                                                 # type: ignore
+
         self.name = "Lv2"
         self.lv = 2
 
@@ -68,14 +73,22 @@ class Lv2(ShowBase):
         self.cleared = None
         self.wait = None
 
-        self.nextLevel = "Lv4"
+        self.nextLevel = "Lv3"
 
         self.accept("mouse1", self.click)
 
         self.queue = CollisionHandlerQueue()
+
+        self.slideSound = loader.loadSfx("audios/stoneSlide.ogg")         # type: ignore
+        self.slideSound.setLoop(False)
+        self.slideSound.setVolume(1) # 0.05 (0-1)
+
+        # Hint
+        base.hint["text"] = "Arraange the numbers in Ascending order."    # type: ignore
         
         # self.solve = copy.deepcopy(unSolvable[0])
-        self.solve = copy.deepcopy(solvable)
+        # self.solve = copy.deepcopy(solvable)
+        self.solve = copy.deepcopy(testing)
         self.solveCord = {}
 
         for Drow in defaultMatrix:
@@ -161,18 +174,22 @@ class Lv2(ShowBase):
     def movRight(self,object,i,j):
         LerpPosInterval(object, 0.4, (object.getPos()+(40,0,0))).start()
         self.solve[i][j], self.solve[i][j+1] = self.solve[i][j+1], self.solve[i][j]
+        self.slideSound.play()
     
     def movLeft(self,object,i,j):
         LerpPosInterval(object, 0.4, (object.getPos()+(-40,0,0))).start()
         self.solve[i][j], self.solve[i][j-1] = self.solve[i][j-1], self.solve[i][j]
+        self.slideSound.play()
     
     def movDown(self,object,i,j):
         LerpPosInterval(object, 0.4, (object.getPos()+(0,-40,0))).start()
         self.solve[i][j], self.solve[i+1][j] = self.solve[i+1][j], self.solve[i][j]
+        self.slideSound.play()
     
     def movUp(self,object,i,j):
         LerpPosInterval(object, 0.4, (object.getPos()+(0,40,0))).start()
         self.solve[i][j], self.solve[i-1][j] = self.solve[i-1][j], self.solve[i][j]
+        self.slideSound.play()
         
     def update(self):
         if self.queue.getNumEntries() > 0:
@@ -184,13 +201,12 @@ class Lv2(ShowBase):
                 i.clearTexture()
             hover.setTexture(self.myTexture)
         
-        if self.solve == defaultMatrix or self.skipLevel == True:
+        if self.solve == defaultMatrix:
+            base.saveData.changeLevelStatus(self.lv,"Cleared")              # type: ignore
             self.cleared = True
-            self.cleanup()
         self.ray.reparentTo(base.camera)                                    # type: ignore
 
     def cleanup(self):
-        print("cleanupp")
         self.environment.removeNode()
-        for i in render.getChildren():                                       # type: ignore
+        for i in render.getChildren():                                      # type: ignore
             i.removeNode()

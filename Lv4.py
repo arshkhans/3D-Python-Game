@@ -35,9 +35,13 @@ class Lv4(ShowBase):
         self.cleared = None
         self.wait = None
 
+        base.crossHair.hide()   # type: ignore
+
         self.nextLevel = "None"
 
-        self.queenImage = OnscreenImage(image='env/icons/queenImage.png', pos=(1.7, 0, -0.9),scale = 0.09)
+        self.queenImage = OnscreenImage(image='env/icons/queenImage.png', 
+                                            pos=(0.88, 0, -0.9),scale = (0.05,0,0.08),
+                                            parent = render2d) # type: ignore  # 2d-pos(x,z,y) (1.7, 0, -0.9)
         self.queenImage.setTransparency(TransparencyAttrib.MAlpha)
 
         base.cursor.setCursorHidden(False)                                             # type: ignore
@@ -99,24 +103,21 @@ class Lv4(ShowBase):
         self.error.hide()
 
         self.clickInfo = OnscreenText(text="",
-                            pos=(1.85, 0.9),
+                            pos=(0.95, 0.9, 0),
                             font = self.font,
-                            scale = 0.1)
+                            # scale = 0.1,
+                            parent = render2d) # type: ignore
 
         self.queenCount = OnscreenText(text="",
                             pos=(1.85, -0.95),
                             font = self.font,
                             scale = 0.11)
-
-        print(render.ls())# type: ignore
         base.hint["text"] = 'Hint: Place eight queens on the chessboard\nsuch that none of them attack one another.' # type: ignore
     
     def click(self):
         if self.queue.getNumEntries() > 0 and base.keyMap["pause"] is False:          # type: ignore
-            print("inside")
             self.queue.sortEntries()
             click = self.queue.getEntry(0).getIntoNodePath()
-            print(click)
             self.setQueen(int(click.getName()[-2:-1]),int(click.getName()[-1:]))
     
     def setQueen(self, a, b):
@@ -178,9 +179,9 @@ class Lv4(ShowBase):
             base.gameBackdrop.show()                                                   # type: ignore
             self.queenImage.hide()
         if self.clicks == 10 and self.cleared is None:
+            self.queenImage.hide()
             base.gameOverScreen.show()                                                 # type: ignore
             base.gameBackdrop.show()                                                   # type: ignore
-            self.queenImage.hide()
     
     def cleanup(self):
         base.gameClearedScreen.hide()                                                  # type: ignore
